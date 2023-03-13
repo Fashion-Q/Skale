@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../entidade/tarefa.dart';
@@ -29,13 +28,15 @@ class TaskController extends ChangeNotifier {
     for (int i = 10;
         i <= double.parse(task.tempo.toString());
         i *= 10, fixWidhtForTime += 11) {}
-    return fixWidhtForTime > fixWidthForPeriod ? fixWidhtForTime : fixWidthForPeriod;
+    return fixWidhtForTime > fixWidthForPeriod
+        ? fixWidhtForTime
+        : fixWidthForPeriod;
   }
 
   String get nome => task.nome;
-  String get periodo => task.periodo.toStringAsFixed(2);
-  String get tempo => task.tempo.toStringAsFixed(2);
+  double get periodo => task.periodo;
   int? get prioridade => task.prioridade;
   bool get noZero => task.noZero;
-  String get chegada => task.chegada.toStringAsFixed(2);
+  double get chegada => task.chegada;
+  double get dTempo => task.tempo;
 }

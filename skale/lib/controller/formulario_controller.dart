@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../entidade/tarefa.dart';
 import '../module/skale_look.dart';
 import '../share/text_style.dart';
-import 'prioridade_controller.dart';
+import 'algorithm_controller.dart';
 
 class ListaDeFormulario extends ChangeNotifier {
   final List<Widget> listForm = [];
@@ -155,7 +154,7 @@ class ListaDeFormulario extends ChangeNotifier {
   //######################################################
   //######################################################
 
-  SkaleLook prioridadeLook() {
+  SkaleLook skalePage({required String tipoAlgoritmo}) {
     List<Task> tarefa = [];
     List<String> char = ["A"];
     int quant = listForm.length;
@@ -170,14 +169,22 @@ class ListaDeFormulario extends ChangeNotifier {
           periodo: double.parse(controller[i][0].text),
           tempo: double.parse(controller[i][1].text),
           chegada: double.parse(controller[i][2].text),
-          prioridade: int.parse(controller[i][5].text),
+          deadLine: controller[i][3].text.isNotEmpty
+              ? double.parse(controller[i][3].text)
+              : null,
+          quantum: controller[i][4].text.isNotEmpty
+              ? double.parse(controller[i][4].text)
+              : null,
+          prioridade: controller[i][5].text.isNotEmpty
+              ? int.parse(controller[i][5].text)
+              : null,
         ),
       );
     }
-    PrioridadeController a = PrioridadeController(
+    SkaleController a = SkaleController(
         task: tarefa,
         x: double.parse(escalonamento.text),
-        info: ["Tarefa(s)", "Período", "Tempo", "Chegada", "Prioridade"]);
+        taskInfo: ["Tarefa(s)", "Período", "Tempo", "Chegada", tipoAlgoritmo]);
     a.addTasks();
 
     SkaleLook p = SkaleLook(
@@ -197,59 +204,25 @@ class ListaDeFormulario extends ChangeNotifier {
         }
       }
     }
-    if (escalonamento.text.isEmpty ||
-        double.parse(escalonamento.text) < 1) {
+    if (escalonamento.text.isEmpty || double.parse(escalonamento.text) < 1) {
       return false;
     }
     return true;
   }
 
-  bool checkFCFS() {
+  bool checkPeriodoTempoChegada() {
     for (int i = 0; i < controller.length; i++) {
       for (int j = 0; j < 3; j++) {
         if (controller[i][j].text.isEmpty) {
           return false;
-        } else if ( j != 2 &&
-            double.parse(controller[i][j].text) <= 0.00) {
+        } else if (j != 2 && double.parse(controller[i][j].text) <= 0.00) {
           return false;
         }
       }
     }
-    if (escalonamento.text.isEmpty ||
-        double.parse(escalonamento.text) < 1) {
+    if (escalonamento.text.isEmpty || double.parse(escalonamento.text) < 1) {
       return false;
     }
     return true;
   }
-
-  SkaleLook fcfsLook() {
-    List<Task> tarefa = [];
-    List<String> char = ["A"];
-    int quant = listForm.length;
-    for (int i = 0; i < quant - 1; i++) {
-      int nextChar = char[i].codeUnitAt(0) + 1;
-      char.add(String.fromCharCode(nextChar));
-    }
-    for (int i = 0; i < char.length; i++) {
-      tarefa.add(
-        Task(
-          nome: char[i],
-          periodo: double.parse(controller[i][0].text),
-          tempo: double.parse(controller[i][1].text),
-          chegada: double.parse(controller[i][2].text),
-        ),
-      );
-    }
-    PrioridadeController a = PrioridadeController(
-        task: tarefa,
-        x: double.parse(escalonamento.text),
-        info: ["Tarefa(s)", "Período", "Tempo", "Chegada", "First Come First Serve"]);
-    a.addTasks();
-
-    SkaleLook p = SkaleLook(
-      controller: a,
-    );
-    return p;
-  }
-
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'controller/prioridade_controller.dart';
+import 'controller/algorithm_controller.dart';
 import 'entidade/tarefa.dart';
-//import 'module/formulario_look.dart';
-//import 'controller/formulario_controller.dart';
+import 'module/formulario_look.dart';
+import 'controller/formulario_controller.dart';
 import 'module/skale_look.dart';
 
 void main() {
@@ -34,8 +34,8 @@ class Root extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: FormularioLook(controller: ListaDeFormulario()),
-      home: teste(),
+      home: FormularioLook(controller: ListaDeFormulario()),
+      //home: teste(),
     );
   }
 }
@@ -43,7 +43,7 @@ class Root extends StatelessWidget {
 SkaleLook teste() {
   List<Task> tarefa = [];
   List<String> char = ["A"];
-  int quant = 3;
+  int quant = 7;
   for (int i = 0; i < quant; i++) {
     int nextChar = char[i].codeUnitAt(0) + 1;
     char.add(String.fromCharCode(nextChar));
@@ -58,17 +58,21 @@ SkaleLook teste() {
       Task(
           nome: char[i],
           periodo: periodo[i],
-          tempo: 0.25,
-          chegada: i == 2 ? 5 : 0,
+          tempo: i == 0 ? 7.5: (i % 3 == 0 ? 0.25 + i.toDouble() : 0.10),
+          chegada: i == 3 ? 5 : 0,
           prioridade: i),
     );
   }
-  PrioridadeController a = PrioridadeController(
-      task: tarefa,
-      x: 50,
-      info: ["Tarefa(s)", "Período", "Tempo", "Chegada", "Prioridade"]);
+  SkaleController a = SkaleController(task: tarefa, x: 50, taskInfo: [
+    "Tarefa(s)",
+    "Período",
+    "Tempo",
+    "Chegada",
+    "Shortest Remaining Time Next"
+  ]);
   a.addTasks();
-
+  //Shortest Job First
+  //"Shortest Remaining Time Next"
   SkaleLook p = SkaleLook(
     controller: a,
   );

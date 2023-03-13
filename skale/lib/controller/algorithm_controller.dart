@@ -5,24 +5,22 @@ import '../module/skale_count_look.dart';
 import '../module/task_look.dart';
 import '../share/box_decoration.dart';
 import '../share/text_style.dart';
-import 'skale_count.dart';
+import 'skale_count_controller.dart';
 import 'task_controller.dart';
 
-class PrioridadeController extends ChangeNotifier {
+class SkaleController extends ChangeNotifier {
   final List<Task> task;
-  final List<Map<String, dynamic>> jsonTodasTarefas = [];
-  final List<TaskController> taskController = [];
   final List<TaskLook> taskLook = [];
-  final List<Widget> infoTable = [];
-  final List<Widget> widgetsTableChegada = [];
+  final List<TaskController> taskController = [];
+  final List<Map<String, dynamic>> jsonTodasTarefas = [];
+  final List<Widget> informacaoDoEscalonamento = [];
+  final List<Widget> tabelaDeChegada = [];
   final List<List<double>> infoChegada = [];
+  int indexInfoChegada = 0;
   final List<Widget> columnRowEscalonamento = [];
   final SkaleCountLook skaleCount =
       SkaleCountLook(controller: SkaleCountController());
   bool counterNotifier = true;
-
-  int indexInfoChegada = 0;
-  //double escalonamentoX = 0.00;
   bool playButton = false;
   bool playButtonOnePerTime = true;
   bool skipperButton = true;
@@ -30,11 +28,11 @@ class PrioridadeController extends ChangeNotifier {
   int sleep = 100;
 
   TaskLook? taskEmExecucao;
-  final List<String> info;
+  final List<String> taskInfo;
   final double x;
 
-  PrioridadeController(
-      {required this.task, required this.x, required this.info});
+  SkaleController(
+      {required this.task, required this.x, required this.taskInfo});
 
   void addTasks() {
     for (int i = 0; i < task.length; i++) {
@@ -42,39 +40,37 @@ class PrioridadeController extends ChangeNotifier {
     }
     for (int i = 0; i < task.length; i++) {
       if (task[i].chegada == 0) {
-        taskController.add(
-          TaskController(task: task[i].copyWith(
-                  novoNome: task[i].nome,
-                  novoChegada: task[i].chegada,
-                  prioridade: task[i].prioridade,
-                  novoTempo: jsonTodasTarefas[i]["Tempo"])),
-        );
+        taskController.add(TaskController(
+            task: task[i].copyWith(
+                novoNome: task[i].nome,
+                novoChegada: task[i].chegada,
+                prioridade: task[i].prioridade,
+                novoTempo: jsonTodasTarefas[i]["Tempo"])));
         taskLook.add(
-          TaskLook(controller: taskController[taskController.length - 1]),
-        );
+            TaskLook(controller: taskController[taskController.length - 1]));
         indexInfoChegada = 1;
       }
     }
     taskEmExecucao = tipoExecucao();
-    //taskEmExecucao = prioridadeProximaExecucao();
 
-    for (int i = 0; i < info.length; i++) {
+    for (int i = 0; i < taskInfo.length; i++) {
       List<Widget> text = [];
       text.add(
         Text(
-          info[i],
+          taskInfo[i],
           style: primaryStyle(size: 16),
         ),
       );
       for (int j = 0; j < task.length; j++) {
         text.add(
           Text(
-            formatName(info[i], jsonTodasTarefas[j][info[i]]),
+            formatNomeTabelaDeInformacao(
+                taskInfo[i], jsonTodasTarefas[j][taskInfo[i]]),
             style: primaryStyle(size: 16),
           ),
         );
       }
-      infoTable.add(
+      informacaoDoEscalonamento.add(
         Padding(
           padding: const EdgeInsets.only(left: 8, right: 8),
           child: Column(
@@ -83,7 +79,7 @@ class PrioridadeController extends ChangeNotifier {
         ),
       );
     }
-    widgetsTableChegada.add(addFirstTableTempoChegadaX());
+    tabelaDeChegada.add(addFirstTableTempoChegadaX());
     List<double> auxChegada = [];
     for (int i = 0; i < task.length; i++) {
       auxChegada.add(task[i].chegada);
@@ -120,7 +116,7 @@ class PrioridadeController extends ChangeNotifier {
           }
         }
         infoChegada.add(List.from(copyList));
-        widgetsTableChegada.add(Column(
+        tabelaDeChegada.add(Column(
           children: columnChegada,
         ));
       }
@@ -131,7 +127,7 @@ class PrioridadeController extends ChangeNotifier {
       taskEmExecucao == null
           ? addColumnRowEscalonamento("0", " ")
           : addColumnRowEscalonamento("0",
-              "${taskEmExecucao!.controller.nome}${taskEmExecucao!.controller.chegada}"),
+              "${taskEmExecucao!.controller.nome}${taskEmExecucao!.chegada}"),
     );
   }
 
@@ -155,7 +151,7 @@ class PrioridadeController extends ChangeNotifier {
         skale,
         style: primaryStyle(size: 16),
       ),
-    ); //Cria uma row e a primeira string é só o numero
+    );
     return Row(
       children: [
         Column(
@@ -226,8 +222,10 @@ class PrioridadeController extends ChangeNotifier {
         );
   }
 
-  String formatName(String chave, dynamic valor) {
-    if (chave == "First Come First Serve") {
+  String formatNomeTabelaDeInformacao(String chave, dynamic valor) {
+    if (chave == "First Come First Serve" ||
+        chave == "Shortest Job First" ||
+        chave == "Shortest Remaining Time Next") {
       return " ";
     }
     return chave == "Tarefa(s)" || chave == "Prioridade"
@@ -246,28 +244,32 @@ class PrioridadeController extends ChangeNotifier {
   }
 
   TaskLook? tipoExecucao() {
-    if (info[info.length - 1] == "Prioridade") {
+    if (taskInfo[taskInfo.length - 1] == "Prioridade") {
       return prioridadeProximaExecucao();
-    } else if (info[info.length - 1] == "First Come First Serve") {
-      return fcfsProximaExecucao();
+    } else if (taskInfo[taskInfo.length - 1] == "First Come First Serve") {
+      return firstComeFirstServesProximaExecucao();
+    } else if (taskInfo[taskInfo.length - 1] == "Shortest Job First" ||
+        taskInfo[taskInfo.length - 1] == "Shortest Remaining Time Next") {
+      return shortestJobFirstProximaExecucao();
     }
+    //"Shortest Job First"
     return null;
   }
 
   void playOrPauseButton() async {
-    if (skaleCount.controller.count < x) {
+    if (skaleCount.count < x) {
       playButton = !playButton;
       notifyListeners();
       if (playButton) {
         if (playButtonOnePerTime) {
           playButtonOnePerTime = false;
-          while (playButton && skaleCount.controller.count < x) {
+          while (playButton && skaleCount.count < x) {
             //algoritimoDePrioridade();
             tipoAlgoritmo();
             await Future.delayed(Duration(milliseconds: sleep));
           }
           playButtonOnePerTime = true;
-          if (skaleCount.controller.count == x) {
+          if (skaleCount.count >= x) {
             playButton = false;
             notifyListeners();
           }
@@ -303,22 +305,18 @@ class PrioridadeController extends ChangeNotifier {
   void resetarTudo() async {
     allButton = false;
     notifyListeners();
-    // for (int i = 0; i < task.length; i++) {
-    //   task[i].tempo = jsonTodasTarefas[i][info[2]];
-    //   task[i].noZero = true;
-    // }
     jsonTodasTarefas.clear();
     taskController.clear();
     taskLook.clear();
-    infoTable.clear();
-    widgetsTableChegada.clear();
+    informacaoDoEscalonamento.clear();
+    tabelaDeChegada.clear();
     infoChegada.clear();
     columnRowEscalonamento.clear();
     taskEmExecucao = null;
     indexInfoChegada = 0;
     playButton = false;
     skipperButton = true;
-    skaleCount.controller.count = 0.00;
+    skaleCount.setCounter = 0.00;
     notifyListeners();
     await Future.delayed(const Duration(seconds: 2));
     addTasks();
@@ -333,9 +331,8 @@ class PrioridadeController extends ChangeNotifier {
     counterNotifier = false;
     notifyListeners();
     await Future.delayed(const Duration(milliseconds: 1000));
-    while (skaleCount.controller.count < x) {
+    while (skaleCount.count < x) {
       tipoAlgoritmo();
-      //algoritimoDePrioridade();
     }
     counterNotifier = true;
     allButton = true;
@@ -343,12 +340,17 @@ class PrioridadeController extends ChangeNotifier {
   }
 
   void tipoAlgoritmo() {
-    if (info[info.length - 1] == "Prioridade") {
+    if (taskInfo[taskInfo.length - 1] == "Prioridade") {
       algoritimoDePrioridade();
-    } else if (info[info.length - 1] == "First Come First Serve") {
-      algoritimoDeFCFS();
+    } else if (taskInfo[taskInfo.length - 1] == "First Come First Serve") {
+      algoritimoDeFirstComeFirstServes();
+    } else if (taskInfo[taskInfo.length - 1] == "Shortest Job First") {
+      algoritimoDeShortestJobFirst();
+    } else if (taskInfo[taskInfo.length - 1] ==
+        "Shortest Remaining Time Next") {
+      algoritimoDeShortestRemainingTimeNext();
     }
-  }
+  } //"Shortest Job First"
 
   //########################################################################
   //########################################################################
@@ -363,46 +365,8 @@ class PrioridadeController extends ChangeNotifier {
   //########################################################################
   //########################################################################
 
-  bool incrementTask() {
-    bool proximaExec = false;
-    if (taskEmExecucao != null && taskEmExecucao!.controller.task.noZero) {
-      taskEmExecucao!.controller.incrementNotifier();
-      if (!taskEmExecucao!.controller.task.noZero) {
-        taskEmExecucao = null;
-        proximaExec = true;
-      }
-    }
-    return proximaExec;
-  }
-
-  bool verificarSeAlguemChegouNaFila() {
-    bool chegouAlguem = false;
-    if (infoChegada.isNotEmpty && indexInfoChegada < infoChegada.length) {
-      for (int i = 0; i < infoChegada[indexInfoChegada].length; i++) {
-        if (infoChegada[indexInfoChegada][i] == skaleCount.controller.count) {
-          taskController.add(
-            TaskController(
-              task: task[i].copyWith(
-                  novoNome: task[i].nome,
-                  novoChegada: infoChegada[indexInfoChegada][i],
-                  prioridade: task[i].prioridade,
-                  novoTempo: jsonTodasTarefas[i]["Tempo"]),
-            ),
-          );
-          taskLook.add(
-            TaskLook(
-              controller: taskController[taskController.length - 1],
-            ),
-          );
-          chegouAlguem = true;
-        }
-      }
-    }
-    return chegouAlguem;
-  }
-
-  void algoritimoDePrioridade() {
-    skaleCount.controller.increment(counterNotifier);
+  void algoritimoDeShortestRemainingTimeNext() {
+    skaleCount.increment(counterNotifier);
     bool proximaExec = false;
     bool chegouAlguem = false;
     proximaExec = incrementTask();
@@ -410,21 +374,124 @@ class PrioridadeController extends ChangeNotifier {
     if (chegouAlguem) {
       TaskLook? taskAnterior = taskEmExecucao;
       taskEmExecucao = tipoExecucao();
-      if (taskAnterior != taskEmExecucao && taskEmExecucao != null) {
+      if (taskAnterior != taskEmExecucao) {
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2),
-            "${taskEmExecucao!.controller.nome}${taskEmExecucao!.controller.chegada}"));
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
       }
       indexInfoChegada++;
     } else if (proximaExec) {
       taskEmExecucao = tipoExecucao();
       if (taskEmExecucao != null) {
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2),
-            "${taskEmExecucao!.controller.nome}${taskEmExecucao!.controller.chegada}"));
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
       } else {
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2), " "));
+            skaleCount.count.toStringAsFixed(2), " "));
+      }
+    }
+    if (skipperButton) {
+      notifyListeners();
+    }
+  }
+
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+
+  void algoritimoDeShortestJobFirst() {
+    skaleCount.increment(counterNotifier);
+    bool proximaExec = false;
+    bool chegouAlguem = false;
+    proximaExec = incrementTask();
+    chegouAlguem = verificarSeAlguemChegouNaFila();
+    if (chegouAlguem) {
+      if (taskEmExecucao == null) {
+        taskEmExecucao = tipoExecucao();
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
+      }
+      indexInfoChegada++;
+    }
+    else if (proximaExec) {
+      taskEmExecucao = tipoExecucao();
+      if (taskEmExecucao != null) {
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
+      } else {
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2), " "));
+      }
+    }
+    if (skipperButton) {
+      notifyListeners();
+    }
+  }
+
+  TaskLook? shortestJobFirstProximaExecucao() {
+    if (taskLook.isEmpty) {
+      return null;
+    }
+    int index = -1;
+    double menorExecucao = double.infinity;
+    for (int i = 0; i < taskLook.length; i++) {
+      if (taskLook[i].controller.noZero && menorExecucao > taskLook[i].dTempo) {
+        menorExecucao = taskLook[i].dTempo;
+        index = i;
+      }
+    }
+    return index > -1 ? taskLook[index] : null;
+  }
+
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+  //########################################################################
+
+  void algoritimoDePrioridade() {
+    skaleCount.increment(counterNotifier);
+    bool proximaExec = false;
+    bool chegouAlguem = false;
+    proximaExec = incrementTask();
+    chegouAlguem = verificarSeAlguemChegouNaFila();
+    if (chegouAlguem) {
+      TaskLook? taskAnterior = taskEmExecucao;
+      taskEmExecucao = tipoExecucao();
+      if (taskAnterior != taskEmExecucao) {
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
+      }
+      indexInfoChegada++;
+    } else if (proximaExec) {
+      taskEmExecucao = tipoExecucao();
+      if (taskEmExecucao != null) {
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
+      } else {
+        columnRowEscalonamento.add(addColumnRowEscalonamento(
+            skaleCount.count.toStringAsFixed(2), " "));
       }
     }
     if (skipperButton) {
@@ -438,12 +505,12 @@ class PrioridadeController extends ChangeNotifier {
     }
     int prioridade = taskEmExecucao == null
         ? 9223372036854775
-        : taskEmExecucao!.controller.prioridade!; //780
+        : taskEmExecucao!.prioridade!; //780
     int index = -1;
     for (int i = 0; i < taskLook.length; i++) {
-      if (taskLook[i].controller.noZero &&
-          prioridade > taskLook[i].controller.prioridade!) {
-        prioridade = taskLook[i].controller.prioridade!;
+      if (taskLook[i].noZero &&
+          prioridade > taskLook[i].prioridade!) {
+        prioridade = taskLook[i].prioridade!;
         index = i;
       }
     }
@@ -466,9 +533,8 @@ class PrioridadeController extends ChangeNotifier {
   //########################################################################
   //########################################################################
 
-  void algoritimoDeFCFS() {
-    skaleCount.controller.increment(counterNotifier);
-    //escalonamentoX = double.parse((escalonamentoX + 0.01).toStringAsFixed(2));
+  void algoritimoDeFirstComeFirstServes() {
+    skaleCount.increment(counterNotifier);
     bool proximaExec = false;
     bool chegouAlguem = false;
     proximaExec = incrementTask();
@@ -477,8 +543,8 @@ class PrioridadeController extends ChangeNotifier {
       if (taskEmExecucao == null) {
         taskEmExecucao = tipoExecucao();
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2),
-            "${taskEmExecucao!.controller.nome}${taskEmExecucao!.controller.chegada}"));
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
         proximaExec = false;
       }
       indexInfoChegada++;
@@ -487,11 +553,11 @@ class PrioridadeController extends ChangeNotifier {
       taskEmExecucao = tipoExecucao();
       if (taskEmExecucao != null) {
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2),
-            "${taskEmExecucao!.controller.nome}${taskEmExecucao!.controller.chegada}"));
+            skaleCount.count.toStringAsFixed(2),
+            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
       } else {
         columnRowEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.controller.count.toStringAsFixed(2), " "));
+            skaleCount.count.toStringAsFixed(2), " "));
       }
     }
     if (skipperButton) {
@@ -499,12 +565,12 @@ class PrioridadeController extends ChangeNotifier {
     }
   }
 
-  TaskLook? fcfsProximaExecucao() {
+  TaskLook? firstComeFirstServesProximaExecucao() {
     if (taskLook.isEmpty) {
       return null;
     }
     for (int i = 0; i < taskLook.length; i++) {
-      if (taskLook[i].controller.noZero) {
+      if (taskLook[i].noZero) {
         return taskLook[i];
       }
     }
@@ -523,5 +589,53 @@ class PrioridadeController extends ChangeNotifier {
   //########################################################################
   //########################################################################
   //########################################################################
-  int abismo = 0;
+  bool incrementTask() {
+    bool proximaExec = false;
+    if (taskEmExecucao != null && taskEmExecucao!.noZero) {
+      taskEmExecucao!.controller.incrementNotifier();
+      if (!taskEmExecucao!.noZero) {
+        taskEmExecucao = null;
+        proximaExec = true;
+      }
+    }
+    return proximaExec;
+  }
+
+  bool verificarSeAlguemChegouNaFila() {
+    bool chegouAlguem = false;
+    if (infoChegada.isNotEmpty && indexInfoChegada < infoChegada.length) {
+      for (int i = 0; i < infoChegada[indexInfoChegada].length; i++) {
+        if (infoChegada[indexInfoChegada][i] == skaleCount.count) {
+          taskController.add(
+            TaskController(
+              task: task[i].copyWith(
+                  novoNome: task[i].nome,
+                  novoChegada: infoChegada[indexInfoChegada][i],
+                  prioridade: task[i].prioridade,
+                  novoTempo: jsonTodasTarefas[i]["Tempo"]),
+            ),
+          );
+          taskLook.add(
+            TaskLook(
+              controller: taskController[taskController.length - 1],
+            ),
+          );
+          chegouAlguem = true;
+        }
+      }
+    }
+    return chegouAlguem;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    jsonTodasTarefas.clear();
+    taskController.clear();
+    taskLook.clear();
+    informacaoDoEscalonamento.clear();
+    tabelaDeChegada.clear();
+    infoChegada.clear();
+    columnRowEscalonamento.clear();
+  }
 }

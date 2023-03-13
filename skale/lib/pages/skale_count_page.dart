@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../controller/skale_count.dart';
+import '../controller/skale_count_controller.dart';
 import '../share/text_style.dart';
 
 class SkaleCount extends StatelessWidget {

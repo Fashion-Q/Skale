@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../controller/prioridade_controller.dart';
+import '../controller/algorithm_controller.dart';
 import '../share/box_decoration.dart';
 import '../share/text_style.dart';
 //import 'dart:developer';
 
 class Prioridade extends StatelessWidget {
   const Prioridade({super.key, required this.controller});
-  final PrioridadeController controller;
+  final SkaleController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class Prioridade extends StatelessWidget {
                     boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
                 alignment: Alignment.center,
                 child: Text(
-                  controller.info[controller.info.length - 1],
+                  controller.taskInfo[controller.taskInfo.length - 1],
                   style: primaryStyle(size: 22, color: Colors.white),
                 ),
               ),
@@ -49,7 +49,7 @@ class Prioridade extends StatelessWidget {
                 ),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: controller.infoTable,
+                  children: controller.informacaoDoEscalonamento,
                 ),
               ),
               Container(
@@ -60,9 +60,9 @@ class Prioridade extends StatelessWidget {
                     boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
                 alignment: Alignment.center,
                 child: Text(
-                        "Tempo de chegada 0 < ${controller.x.toStringAsFixed(2)}",
-                        style: primaryStyle(size: 18,color: Colors.white),
-                      ),
+                  "Tempo de chegada (X) < ${controller.x.toStringAsFixed(2)}",
+                  style: primaryStyle(size: 18, color: Colors.white),
+                ),
               ),
               Container(
                 decoration: boxDecorationTopRightLeft(
@@ -78,7 +78,7 @@ class Prioridade extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     children: [
                       Row(
-                        children: controller.widgetsTableChegada,
+                        children: controller.tabelaDeChegada,
                       ),
                       const SizedBox(
                         width: 60,
@@ -155,7 +155,7 @@ class Prioridade extends StatelessWidget {
                 color: const Color.fromARGB(72, 0, 150, 135),
                 child: Text(
                   "Escalonamento ${controller.skaleCount.controller.count.toStringAsFixed(2)} < ${controller.x}",
-                  style: primaryStyle(size: 22, color: Colors.black),
+                  style: primaryStyle(size: 18, color: Colors.black),
                 ),
               ),
               Container(
