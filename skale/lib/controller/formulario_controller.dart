@@ -181,11 +181,15 @@ class ListaDeFormulario extends ChangeNotifier {
         ),
       );
     }
+    final List<Map<String, dynamic>> jsonTodasTarefas = [];
+  for (int i = 0; i < tarefa.length; i++) {
+      jsonTodasTarefas.add(tarefa[i].toJason());
+    }
     SkaleController a = SkaleController(
         task: tarefa,
         x: double.parse(escalonamento.text),
-        taskInfo: ["Tarefa(s)", "Período", "Tempo", "Chegada", tipoAlgoritmo]);
-    a.addTasks();
+        taskInfo: ["Tarefa(s)", "Período", "Tempo", "Chegada", tipoAlgoritmo],jsonTodasTarefas: jsonTodasTarefas);
+    a.setTasks();
 
     SkaleLook p = SkaleLook(
       controller: a,

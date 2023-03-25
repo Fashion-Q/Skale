@@ -29,6 +29,53 @@ class Prioridade extends StatelessWidget {
             children: [
               Container(
                 width: size.width,
+                height: 50,
+                padding: const EdgeInsets.only(top: 8,bottom: 2,left: 8),
+                decoration:
+                    boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    boxDecorationBorderStroke(
+                      cor: Colors.red,
+                      borderWidth: 2,
+                      child: IconButton(
+                        onPressed: controller.allButton ? (){
+                          
+                        } : null,
+                        icon: const Icon(
+                          Icons.keyboard_arrow_up,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12,),
+                    Text(
+                      "Escolha o algoritmo",
+                      style: primaryStyle(size: 20, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: size.width,
+                height: 200,
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: boxDecorationBottomLeftRight(
+                  radius: 8,
+                  color: const Color.fromARGB(255, 163, 163, 163),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: const [],
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                width: size.width,
                 height: 40,
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration:
@@ -36,7 +83,7 @@ class Prioridade extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   controller.taskInfo[controller.taskInfo.length - 1],
-                  style: primaryStyle(size: 22, color: Colors.white),
+                  style: primaryStyle(size: 20, color: Colors.white),
                 ),
               ),
               Container(
@@ -49,7 +96,7 @@ class Prioridade extends StatelessWidget {
                 ),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: controller.informacaoDoEscalonamento,
+                  children: controller.informacaoDoAlgoritmo,
                 ),
               ),
               Container(
@@ -119,8 +166,8 @@ class Prioridade extends StatelessWidget {
                       ),
                     ),
                     Row(
-                      children: controller.taskLook.isNotEmpty
-                          ? controller.taskLook
+                      children: controller.queueWidget.isNotEmpty
+                          ? controller.queueWidget
                           : <Widget>[],
                     ),
                     const SizedBox(
@@ -176,7 +223,7 @@ class Prioridade extends StatelessWidget {
                         Row(
                           children: [
                             Row(
-                              children: controller.columnRowEscalonamento,
+                              children: controller.informacaoDoEscalonamento,
                             ),
                             Column(
                               children: [
@@ -297,7 +344,7 @@ class Prioridade extends StatelessWidget {
                             color: controller.allButton ? Colors.blue : null,
                             child: IconButton(
                               onPressed: controller.allButton
-                                  ? controller.resetarTudo
+                                  ? controller.resetarAtual
                                   : null,
                               icon: const Icon(
                                 Icons.restart_alt,
@@ -311,24 +358,18 @@ class Prioridade extends StatelessWidget {
                   ],
                 ),
               ),
-              // Container(
-              //   width: 50,
-              //   margin: const EdgeInsets.only(top: 20),
-              //   color: controller.allButton ? Colors.blue : null,
-              //   child: IconButton(
-              //     onPressed: () {
-              //       controller.abismo++;
-              //       debugPrint(controller.abismo.toString());
-              //       debugPrint(controller.taskLook.length.toString());
-              //       debugPrint(controller.indexInfoChegada.toString());
-              //       debugPrint(controller.infoChegada.toString());
-              //     },
-              //     icon: const Icon(
-              //       Icons.restart_alt,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
+              Container(
+                width: 50,
+                margin: const EdgeInsets.only(top: 20),
+                color: controller.allButton ? Colors.blue : null,
+                child: IconButton(
+                  onPressed: controller.testador,
+                  icon: const Icon(
+                    Icons.restart_alt,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
               const SizedBox(height: 30)
             ],
           ),

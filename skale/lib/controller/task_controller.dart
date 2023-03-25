@@ -19,20 +19,6 @@ class TaskController extends ChangeNotifier {
     notifyListeners();
   }
 
-  double fixWidth() {
-    double fixWidhtForTime = 0;
-    double fixWidthForPeriod = 0;
-    for (int i = 10;
-        i <= double.parse(task.periodo.toString());
-        i *= 10, fixWidthForPeriod += 11) {}
-    for (int i = 10;
-        i <= double.parse(task.tempo.toString());
-        i *= 10, fixWidhtForTime += 11) {}
-    return fixWidhtForTime > fixWidthForPeriod
-        ? fixWidhtForTime
-        : fixWidthForPeriod;
-  }
-
   String get nome => task.nome;
   double get periodo => task.periodo;
   int? get prioridade => task.prioridade;

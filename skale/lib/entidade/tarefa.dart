@@ -6,35 +6,40 @@ class Task {
   double? deadLine;
   double? quantum;
   int? prioridade;
-  bool noZero = true;
+  bool noZero;
+  bool boolExecucao;
 
-  Task copyWith(
-    {
-      required String novoNome,
-      required double novoChegada,
-      required double novoTempo,
-      double? deadLine,
-      double? quantum,
-      int? prioridade,
-    }
-  ) => Task(
-      nome: novoNome,
-      periodo: periodo,
-      tempo: novoTempo,
-      chegada: novoChegada,
-      deadLine: deadLine,
-      quantum: quantum,
-      prioridade: prioridade);
+  Task copyWith({
+    String? novoNome,
+    double? novoChegada,
+    double? novoTempo,
+    double? deadLine,
+    double? quantum,
+    int? prioridade,
+    bool? novoNoZero,
+    bool? novaTaskEmExecucao,
+  }) =>
+      Task(
+          nome: novoNome ?? nome,
+          periodo: periodo,
+          tempo: novoTempo ?? tempo,
+          chegada: novoChegada ?? chegada,
+          deadLine: deadLine,
+          quantum: quantum,
+          prioridade: prioridade,
+          noZero: novoNoZero ?? true,
+          boolExecucao: novaTaskEmExecucao ?? false);
 
-  Task({
-    required this.nome,
-    required this.periodo,
-    required this.tempo,
-    required this.chegada,
-    this.deadLine,
-    this.quantum,
-    this.prioridade,
-  });
+  Task(
+      {required this.nome,
+      required this.periodo,
+      required this.tempo,
+      required this.chegada,
+      this.deadLine,
+      this.quantum,
+      this.prioridade,
+      this.noZero = true,
+      this.boolExecucao = false});
 
   Map<String, dynamic> toJason() => {
         "Tarefa(s)": nome,
