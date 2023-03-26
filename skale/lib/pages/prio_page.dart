@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skale/share/snackbar.dart';
 import '../controller/algorithm_controller.dart';
 import '../share/box_decoration.dart';
 import '../share/text_style.dart';
@@ -26,58 +27,45 @@ class Prioridade extends StatelessWidget {
           decoration: boxDecorationAll(
               radius: 16, color: const Color.fromARGB(82, 6, 232, 191)),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: size.width,
-                height: 50,
-                padding: const EdgeInsets.only(top: 8,bottom: 2,left: 8),
-                decoration:
-                    boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    boxDecorationBorderStroke(
-                      cor: Colors.red,
-                      borderWidth: 2,
-                      child: IconButton(
-                        onPressed: controller.allButton ? (){
-                          
-                        } : null,
-                        icon: const Icon(
-                          Icons.keyboard_arrow_up,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12,),
-                    Text(
-                      "Escolha o algoritmo",
-                      style: primaryStyle(size: 20, color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: size.width,
-                height: 200,
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(8),
-                decoration: boxDecorationBottomLeftRight(
-                  radius: 8,
-                  color: const Color.fromARGB(255, 163, 163, 163),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: const [],
-                    )
-                  ],
+                padding: const EdgeInsets.only(left: 15),
+                width: 320,
+                decoration: boxDecorationTopLeft(radius: 16,color: Colors.blue),
+                alignment: Alignment.centerLeft,
+                child: DropdownButton<String>(
+                  elevation: 0,
+                  dropdownColor: Colors.blue,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.white,
+                  ),
+                  underline: const SizedBox(),
+                  style: primaryStyle(size: 20),
+                  value: controller.taskInfo[controller.taskInfo.length - 1],
+                  items: controller.nomesAlgoritmo.map((nome) {
+                    return DropdownMenuItem(
+                      value: nome,
+                      child: Text(nome,),
+                    );
+                  }).toList(),
+                  onChanged: controller.allButton ? (String? valor) {
+                    if (!controller.dropDownButton(valor!) &&
+                        controller.allButton) {
+                      controller.controllSnackBar();
+                      Future.delayed(const Duration());
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        snackMessage(controller.mensagem ?? "Error not found"),
+                      );
+                    }
+                  } : null,
                 ),
               ),
               Container(
                 width: size.width,
                 height: 40,
-                margin: const EdgeInsets.only(bottom: 8),
+                margin: const EdgeInsets.only(bottom: 8, top: 8),
                 decoration:
                     boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
                 alignment: Alignment.center,
@@ -96,7 +84,11 @@ class Prioridade extends StatelessWidget {
                 ),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: controller.informacaoDoAlgoritmo,
+                  children: [
+                    Row(
+                      children: controller.informacaoDoAlgoritmo,
+                    ),
+                  ],
                 ),
               ),
               Container(
@@ -250,7 +242,7 @@ class Prioridade extends StatelessWidget {
               ),
               //const SizedBox(height: 20,),
               SizedBox(
-                width: size.width * 0.90,
+                width: size.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -358,18 +350,18 @@ class Prioridade extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                width: 50,
-                margin: const EdgeInsets.only(top: 20),
-                color: controller.allButton ? Colors.blue : null,
-                child: IconButton(
-                  onPressed: controller.testador,
-                  icon: const Icon(
-                    Icons.restart_alt,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+              // Container(
+              //   width: 50,
+              //   margin: const EdgeInsets.only(top: 20),
+              //   color: controller.allButton ? Colors.blue : null,
+              //   child: IconButton(
+              //     onPressed: controller.testador,
+              //     icon: const Icon(
+              //       Icons.restart_alt,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 30)
             ],
           ),

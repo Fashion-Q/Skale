@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../controller/formulario_controller.dart';
+import '../share/snackbar.dart';
 import '../share/text_style.dart';
 
 class FormularioPage extends StatelessWidget {
@@ -24,36 +25,6 @@ class FormularioPage extends StatelessWidget {
             margin: const EdgeInsets.only(left: 8, right: 8, top: 12),
             child: Column(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 15),
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  color: const Color.fromARGB(117, 189, 188, 185),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Período precisa ser >= 0.01",
-                        style: primaryStyle(
-                          size: 18,
-                        ),
-                      ),
-                      Text(
-                        "Tempo de execução precisa ser >= 0.01",
-                        style: primaryStyle(
-                          size: 18,
-                        ),
-                      ),
-                      Text(
-                        "Tamanho de tarefas precisa ser >= 1",
-                        style: primaryStyle(size: 18),
-                      ),
-                      Text(
-                        "Escalonamento precisa ser >= 1",
-                        style: primaryStyle(size: 18),
-                      ),
-                    ],
-                  ),
-                ),
                 Column(
                   children: controller.listForm,
                 ),
@@ -81,7 +52,7 @@ class FormularioPage extends StatelessWidget {
                           ),
                           child: TextField(
                             controller: controller.escalonamento,
-                            maxLength: 8, // 10 000 000
+                            maxLength: 4, // 10 000 000
                             decoration: const InputDecoration(
                                 counterText: "",
                                 isCollapsed: true,
@@ -106,7 +77,9 @@ class FormularioPage extends StatelessWidget {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red),
-                        onPressed: controller.removeLastForm,
+                        onPressed: controller.allButton
+                            ? controller.removeLastForm
+                            : null,
                         child: const Icon(Icons.remove),
                       ),
                       const SizedBox(
@@ -115,9 +88,18 @@ class FormularioPage extends StatelessWidget {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green),
-                        onPressed: () {
-                          controller.addForm(size);
-                        },
+                        onPressed: controller.allButton
+                            ? () {
+                                if (!controller.addForm(size)) {
+                                  controller.controllSnackBar();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    snackMessage(
+                                      controller.mensagem,
+                                    ),
+                                  );
+                                }
+                              }
+                            : null,
                         child: const Icon(Icons.add),
                       ),
                     ],
@@ -128,111 +110,49 @@ class FormularioPage extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: controller.listForm.isNotEmpty &&
                             controller.allButton
-                        ? () {
-                            if (controller.checkPrioridade()) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => controller.skalePage(
-                                      tipoAlgoritmo: "Prioridade"),
-                                ),
-                              );
+                        ? () async{
+                            if (await controller.checkPrinciaisFuncionalidades()) {
                             } else if (controller.allButton) {
                               controller.controllSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                controller.snackMessage(
-                                    "Algoritmo de Prioridade não está de acordo"),
+                                snackMessage(
+                                  controller.mensagem,
+                                ),
                               );
                             }
                           }
                         : null,
                     child: Text(
-                      "Prioridade",
-                      style: primaryStyle(size: 16),
+                      "Válidar Informações",
+                      style: primaryStyle(size: 18),
                     ),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
                   child: ElevatedButton(
-                    onPressed: controller.listForm.isNotEmpty &&
-                            controller.allButton
+                    onPressed: controller.validarInformacoes 
                         ? () {
-                            if (controller.checkPeriodoTempoChegada()) {
+                            if (controller.validarInformacoes) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => controller.skalePage(tipoAlgoritmo: "First Come First Serve"),
+                                  builder: (context) =>  controller.skaleP!,
                                 ),
                               );
                             } else if (controller.allButton) {
                               controller.controllSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                controller.snackMessage(
-                                    "Algoritmo de FCFS não está de acordo"),
-                              );
-                            }
-                          }
-                        : null,
-                    child: Text(
-                      "FCFS - First Come First Serve",
-                      style: primaryStyle(size: 16),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: ElevatedButton(
-                    onPressed: controller.listForm.isNotEmpty &&
-                            controller.allButton
-                        ? () {
-                            if (controller.checkPeriodoTempoChegada()) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => controller.skalePage(tipoAlgoritmo: "Shortest Job First"),
+                                snackMessage(
+                                  controller.mensagem,
                                 ),
                               );
-                            } else if (controller.allButton) {
-                              controller.controllSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                controller.snackMessage(
-                                    "Algoritmo de SFJ não está de acordo"),
-                              );
                             }
                           }
                         : null,
                     child: Text(
-                      "SJF - Shortest Job First",
-                      style: primaryStyle(size: 16),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: ElevatedButton(
-                    onPressed: controller.listForm.isNotEmpty &&
-                            controller.allButton
-                        ? () {
-                            if (controller.checkPeriodoTempoChegada()) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => controller.skalePage(tipoAlgoritmo: "Shortest Remaining Time Next"),
-                                ),
-                              );
-                            } else if (controller.allButton) {
-                              controller.controllSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                controller.snackMessage(
-                                    "Algoritmo de SRNT não está de acordo"),
-                              );
-                            }
-                          }
-                        : null,
-                    child: Text(
-                      "SRNT - Shortest Remaining Next Time",
-                      style: primaryStyle(size: 16),
+                      "Página de Escalonamento",
+                      style: primaryStyle(size: 18),
                     ),
                   ),
                 ),

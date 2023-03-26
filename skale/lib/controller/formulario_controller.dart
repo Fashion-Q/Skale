@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../entidade/tarefa.dart';
 import '../module/skale_look.dart';
+import '../share/box_decoration.dart';
 import '../share/text_style.dart';
 import 'algorithm_controller.dart';
 
@@ -17,11 +18,20 @@ class ListaDeFormulario extends ChangeNotifier {
     "Quantum:",
     "Prioridade:"
   ];
+  SkaleLook? skaleP;
+  final List<bool> checarAlgoritmos = [true, true, true, true, true];
   bool allButton = true;
+  bool validarInformacoes = false;
 
-  void addForm(Size size) {
+  bool addForm(Size size) {
+    if (listForm.length > 25) {
+      mensagem = "O tamanho de tarefas não pode ser maior que 25";
+      return false;
+    }
+    validarInformacoes = false;
     listForm.add(novoForm(size));
     notifyListeners();
+    return true;
   }
 
   Widget getRow(
@@ -50,6 +60,12 @@ class ListaDeFormulario extends ChangeNotifier {
           ),
           child: TextField(
             controller: controller[linha][coluna],
+            onChanged: (String? texto) {
+              if (validarInformacoes) {
+                validarInformacoes = false;
+                notifyListeners();
+              }
+            },
             maxLength: nome == info[5] ? 2 : null,
             enabled: aberto,
             decoration: const InputDecoration(
@@ -66,7 +82,7 @@ class ListaDeFormulario extends ChangeNotifier {
     if (nome != info[5]) {
       return [
         FilteringTextInputFormatter.allow(
-          RegExp(r'^\d{1,8}(\.\d{0,2})?'),
+          RegExp(r'^\d{1,4}(\.\d{0,2})?'),
           replacementString: '',
         ),
       ];
@@ -88,17 +104,33 @@ class ListaDeFormulario extends ChangeNotifier {
     }
 
     return Container(
-      color: Colors.black12,
       width: size.width - 50,
-      margin: const EdgeInsets.only(top: 8),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: boxDecorationTopRightLeft(radius: 16, color: Colors.black12),
       child: Column(
-        children: rows,
+        children: [
+          Container(
+            width: size.width,
+            height: 40,
+            decoration:
+                boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
+            alignment: Alignment.center,
+            child: Text(
+              "Tarefa: ${String.fromCharCode(listForm.length + 65)}",
+              style: primaryStyle(size: 20, color: Colors.white),
+            ),
+          ),
+          Column(
+            children: rows,
+          )
+        ],
       ),
     );
   }
 
   void removeLastForm() {
-    if (listForm.isNotEmpty) {
+    if (listForm.length > 1) {
+      validarInformacoes = false;
       listForm.removeAt(listForm.length - 1);
       controller.removeAt(controller.length - 1);
     }
@@ -111,16 +143,6 @@ class ListaDeFormulario extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 7));
     allButton = true;
     notifyListeners();
-  }
-
-  SnackBar snackMessage(String texto) {
-    return SnackBar(
-      content: Text(
-        texto,
-        style: primaryStyle(size: 18),
-      ),
-      duration: const Duration(seconds: 7),
-    );
   }
 
   @override
@@ -154,7 +176,9 @@ class ListaDeFormulario extends ChangeNotifier {
   //######################################################
   //######################################################
 
-  SkaleLook skalePage({required String tipoAlgoritmo}) {
+  String mensagem = "";
+
+  SkaleLook skalePage() {
     List<Task> tarefa = [];
     List<String> char = ["A"];
     int quant = listForm.length;
@@ -181,14 +205,11 @@ class ListaDeFormulario extends ChangeNotifier {
         ),
       );
     }
-    final List<Map<String, dynamic>> jsonTodasTarefas = [];
-  for (int i = 0; i < tarefa.length; i++) {
-      jsonTodasTarefas.add(tarefa[i].toJason());
-    }
     SkaleController a = SkaleController(
-        task: tarefa,
-        x: double.parse(escalonamento.text),
-        taskInfo: ["Tarefa(s)", "Período", "Tempo", "Chegada", tipoAlgoritmo],jsonTodasTarefas: jsonTodasTarefas);
+      task: tarefa,
+      x: double.parse(escalonamento.text),
+      checarAlgoritmos: checarAlgoritmos,
+    );
     a.setTasks();
 
     SkaleLook p = SkaleLook(
@@ -197,35 +218,72 @@ class ListaDeFormulario extends ChangeNotifier {
     return p;
   }
 
-  bool checkPrioridade() {
-    for (int i = 0; i < controller.length; i++) {
-      for (int j = 0; j < controller[i].length; j++) {
-        if (controller[i][j].text.isEmpty && j != 3 && j != 4) {
-          return false;
-        } else if ((j == 0 || j == 1) &&
-            double.parse(controller[i][j].text) <= 0.00) {
-          return false;
-        }
+  Future<bool> checkPrinciaisFuncionalidades() async {
+    validarInformacoes = false;
+    allButton = false;
+    notifyListeners();
+    await Future.delayed(const Duration(milliseconds: 500));
+    checarAlgoritmos[0] = checkPeriodo();
+    checarAlgoritmos[1] = checkTempoExecucao();
+    checarAlgoritmos[2] = checkChegada();
+    checarAlgoritmos[3] = checkPrioridade();
+    checarAlgoritmos[4] = true;
+    for (int i = 0; i < 3; i++) {
+      if (!checarAlgoritmos[i]) {
+        mensagem = "Preencha os campos de: ${info[i]}";
+        mensagem = mensagem.substring(0, mensagem.length - 1);
+        allButton = true;
+        notifyListeners();
+        return false;
       }
     }
     if (escalonamento.text.isEmpty || double.parse(escalonamento.text) < 1) {
+      mensagem = 'Preencha o único campo de "Escalonamento"';
+      allButton = true;
+      notifyListeners();
       return false;
+    }
+    skaleP = skalePage();
+    validarInformacoes = true;
+    allButton = true;
+    notifyListeners();
+    return true;
+  }
+
+  bool checkPeriodo() {
+    for (int i = 0; i < controller.length; i++) {
+      if (controller[i][0].text.isEmpty ||
+          double.parse(controller[i][0].text) <= 0.00) {
+        return false;
+      }
     }
     return true;
   }
 
-  bool checkPeriodoTempoChegada() {
+  bool checkTempoExecucao() {
     for (int i = 0; i < controller.length; i++) {
-      for (int j = 0; j < 3; j++) {
-        if (controller[i][j].text.isEmpty) {
-          return false;
-        } else if (j != 2 && double.parse(controller[i][j].text) <= 0.00) {
-          return false;
-        }
+      if (controller[i][1].text.isEmpty ||
+          double.parse(controller[i][0].text) <= 0.00) {
+        return false;
       }
     }
-    if (escalonamento.text.isEmpty || double.parse(escalonamento.text) < 1) {
-      return false;
+    return true;
+  }
+
+  bool checkChegada() {
+    for (int i = 0; i < controller.length; i++) {
+      if (controller[i][2].text.isEmpty) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool checkPrioridade() {
+    for (int i = 0; i < controller.length; i++) {
+      if (controller[i][5].text.isEmpty) {
+        return false;
+      }
     }
     return true;
   }

@@ -14,7 +14,7 @@ class SkaleController extends ChangeNotifier {
   final List<Task> task;
   final List<TaskInterface> queueWidget = [];
   int indexQueueWidget = 0;
-  final List<Map<String, dynamic>> jsonTodasTarefas;
+  final List<Map<String, dynamic>> jsonTodasTarefas = [];
   final List<Widget> informacaoDoAlgoritmo = [];
   final List<Widget> tabelaDeChegada = [];
   final List<List<double>> infoChegada = [];
@@ -34,25 +34,34 @@ class SkaleController extends ChangeNotifier {
   int sleep = 2;
 
   TaskInterface? taskEmExecucao;
-  final List<String> taskInfo;
+  final List<String> taskInfo = [
+    "Tarefa(s)",
+    "Período",
+    "Tempo",
+    "Chegada",
+    "First Come First Serve"
+  ]; //First Come First Serve
   final double x;
   Function? executarAlgoritmo;
 
   SkaleController(
       {required this.task,
       required this.x,
-      required this.taskInfo,
-      required this.jsonTodasTarefas});
+      required this.checarAlgoritmos});
 
-  void setTasks() async {
+  int abismo = 0;
+
+  void setTasks() {
+    for (int i = 0; i < task.length; i++) {
+      jsonTodasTarefas.add(task[i].toJason());
+    }
     executarAlgoritmo = tipoAlgoritmo();
-    //jsonMonotonic();
+    
     preencherTabelaDeInformacao();
 
     preencherTabelaDeChegada();
 
     comecarFilaEscalonamento();
-    //charMonotonic = null;
   }
 
   void comecarFilaEscalonamento() {
@@ -266,6 +275,7 @@ class SkaleController extends ChangeNotifier {
   }
 
   void resetarTudo() async {
+    charMonotonic = null;
     allButton = false;
     notifyListeners();
     jsonTodasTarefas.clear();
@@ -280,7 +290,6 @@ class SkaleController extends ChangeNotifier {
     playButton = false;
     animationButton = true;
     skaleCount.setCounter = 0.00;
-    notifyListeners();
     await Future.delayed(const Duration(milliseconds: 500));
     setTasks();
     allButton = true;
@@ -303,7 +312,8 @@ class SkaleController extends ChangeNotifier {
   }
 
   Function? tipoAlgoritmo() {
-    if (taskInfo[taskInfo.length - 1] == "Prioridade") {
+    if (taskInfo[taskInfo.length - 1] == "Prioridade" ||
+        taskInfo[taskInfo.length - 1] == "Rate Monotonic") {
       return algoritimoDePrioridade;
     } else if (taskInfo[taskInfo.length - 1] == "First Come First Serve") {
       return algoritimoDeFirstComeFirstServes;
@@ -312,9 +322,8 @@ class SkaleController extends ChangeNotifier {
     } else if (taskInfo[taskInfo.length - 1] ==
         "Shortest Remaining Time Next") {
       return algoritimoDeShortestRemainingTimeNext;
-    } else if (taskInfo[taskInfo.length - 1] == "Rate Monotonic") {
-      return algoritimoDeRateMonotonic;
     }
+
     return null;
   }
 
@@ -332,7 +341,10 @@ class SkaleController extends ChangeNotifier {
     ));
   }
 
-  void preencherTabelaDeInformacao() {
+  void preencherTabelaDeInformacao() async {
+    //await Future.delayed(const Duration(seconds: 1));
+    //informacaoDoAlgoritmo.clear();
+    abismo++;
     for (int i = 0; i < taskInfo.length; i++) {
       List<Widget> text = [];
       text.add(
@@ -443,49 +455,38 @@ class SkaleController extends ChangeNotifier {
     proximaExec = incrementTask();
     chegouAlguem = verificarSeAlguemChegouNaFila();
     if (chegouAlguem) {
-      TaskInterface? taskAnterior = taskEmExecucao;
-      taskEmExecucao = tipoExecucao();
-      if (taskAnterior != taskEmExecucao) {
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2),
-            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
-      }
+      adicionarEscalonamentoChegouAlguem();
       indexInfoChegada++;
     } else if (proximaExec) {
-      taskEmExecucao = tipoExecucao();
-      if (taskEmExecucao != null) {
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2),
-            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
-      } else {
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2), " "));
-      }
+      adicionarEscalonamentoProxExe();
     }
     if (animationButton) {
       notifyListeners();
     }
   }
 
-  TaskLook? rateMonotonicProximaExecucao() {
-    // if (taskLook.isEmpty) {
-    //   return null;
-    // }
-    // int index = -1;
-    // double menorPeriodo = double.infinity;
-    // if (taskEmExecucao != null) {
-    //   menorPeriodo = taskEmExecucao!.periodo;
-    // }
-    // for (int i = 0; i < taskLook.length; i++) {
-    //   if (taskLook[i].noZero && menorPeriodo > taskLook[i].periodo) {
-    //     menorPeriodo = taskLook[i].periodo;
-    //     index = i;
-    //   }
-    // }
-    // if (taskEmExecucao != null && index == -1) {
-    //   return taskEmExecucao;
-    // }
-    // return index > -1 ? taskLook[index] : null;
+  TaskInterface? rateMonotonicProximaExecucao() {
+    if (queueWidget.isEmpty) {
+      return null;
+    }
+    int index = -1;
+    int indexQueueAnterior = indexQueueWidget;
+    double menorPeriodo = 9223372036;
+    if (taskEmExecucao != null) {
+      menorPeriodo = taskEmExecucao!.periodo;
+    }
+    for (int i = 0; i < queueWidget.length; i++) {
+      if (queueWidget[i].noZero && menorPeriodo > queueWidget[i].periodo) {
+        menorPeriodo = queueWidget[i].periodo;
+        index = i;
+        indexQueueWidget = i;
+      }
+    }
+    if (menorPeriodo != 9223372036) {
+      return index > -1
+          ? getTaskLook(indexQueueAnterior: indexQueueAnterior)
+          : taskEmExecucao;
+    }
     return null;
   }
 
@@ -645,21 +646,11 @@ class SkaleController extends ChangeNotifier {
     chegouAlguem = verificarSeAlguemChegouNaFila();
     if (chegouAlguem) {
       if (taskEmExecucao == null) {
-        taskEmExecucao = tipoExecucao();
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2),
-            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
+        adicionarEscalonamentoChegouAlguem();
       }
+      indexInfoChegada++;
     } else if (proximaExec) {
-      taskEmExecucao = tipoExecucao();
-      if (taskEmExecucao != null) {
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2),
-            "${taskEmExecucao!.nome}${taskEmExecucao!.chegada}"));
-      } else {
-        informacaoDoEscalonamento.add(addColumnRowEscalonamento(
-            skaleCount.count.toStringAsFixed(2), " "));
-      }
+      adicionarEscalonamentoProxExe();
     }
     if (animationButton) {
       notifyListeners();
@@ -773,20 +764,66 @@ class SkaleController extends ChangeNotifier {
       sleep = 2;
     }
     notifyListeners();
+    //allButton = !allButton;
+  }
+
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+//########################################################################
+  //Shortest Job First
+  //"Shortest Remaining Time Next"
+  //Rate Monotonic
+  //"First Come First Serve"
+  //Prioridade
+
+  final List<bool> checarAlgoritmos;
+
+  final List<String> nomesAlgoritmo = [
+    "First Come First Serve",
+    "Shortest Job First",
+    "Shortest Remaining Time Next",
+    "Prioridade",
+    "Rate Monotonic"
+  ];
+
+  String? mensagem;
+
+  void controllSnackBar() async {
+    allButton = false;
+    notifyListeners();
+    await Future.delayed(const Duration(seconds: 7));
+    allButton = true;
+    notifyListeners();
+  }
+
+  bool dropDownButton(String valor) {
+    for (int i = 0; i < nomesAlgoritmo.length; i++) {
+      if (nomesAlgoritmo[i] == valor) {
+        if (checarAlgoritmos[i] == false) {
+          mensagem =
+              "Algoritmo não está totalmente preenchido: (${nomesAlgoritmo[i]})";
+          return false;
+        }
+      }
+      if (valor == taskInfo[taskInfo.length - 1]) {
+        return true;
+      }
+    }
+    taskInfo[taskInfo.length - 1] = valor;
+    if (valor == "Rate Monotonic" && jsonMonotonicTabela.isEmpty) {
+      jsonMonotonic();
+    }
+    resetarTudo();
+
+    return true;
   }
 }
-
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-  //########################################################################
-
-  
