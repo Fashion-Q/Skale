@@ -1,43 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:skale/interface/task_interface.dart';
 import '../controller/task_controller.dart';
-import '../entidade/tarefa.dart';
+import '../entidade/task_entity.dart';
 import '../pages/task_page.dart';
 
 class TaskLook extends StatelessWidget implements TaskInterface {
-  const TaskLook({super.key, required this.controller});
+  const TaskLook(
+      {super.key, required this.controller, required this.tipoAlgoritmo});
   final TaskController controller;
 
+  final String tipoAlgoritmo;
   @override
-  Task get task => controller.task;
+  TaskEntity get taskEntity => controller.task;
   @override
-  bool get boolExecucao => controller.task.boolExecucao;
+  bool get isOnPrompt => controller.task.isOnPrompt;
   @override
-  String get nome => controller.nome;
+  String get name => controller.nome;
   @override
   int? get prioridade => controller.prioridade;
   @override
-  bool get noZero => controller.noZero;
+  double? get quantum => taskEntity.quantum;
+  @override
+  double? get deadLine => taskEntity.deadLine;
+  @override
+  bool get timeIsNotFinished => controller.timeIsNotFinished;
   @override
   double get chegada => controller.chegada;
   @override
   double get periodo => controller.periodo;
   @override
   double get dTempo => controller.dTempo;
-  
+
   @override
-  set setBoolExecucao(bool boo) {
-    controller.task.boolExecucao = boo;
-  }
+  set setIsOnPromptBool(bool boo) => controller.task.isOnPrompt = boo;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) => TaskPage(
-        task: controller.task,
+        taskEntity: controller.task,
+        tipoAlgoritmo: tipoAlgoritmo,
       ),
     );
   }
-  
 }

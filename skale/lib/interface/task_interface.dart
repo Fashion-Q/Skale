@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import '../entidade/tarefa.dart';
+import '../entidade/task_entity.dart';
 
 abstract class TaskInterface extends Widget {
   const TaskInterface({super.key});
-// set setCounter(double novoValor) {
-//     controller.count = novoValor;
-//   }
-  set setBoolExecucao(bool boo);
-  Task get task;
-  bool get boolExecucao;
-  String get nome;
+  set setIsOnPromptBool(bool boo);
+  TaskEntity get taskEntity;
+  bool get isOnPrompt;
+  String get name;
   int? get prioridade;
-  bool get noZero;
+  bool get timeIsNotFinished;
   double get chegada;
   double get periodo;
   double get dTempo;
+  double? get quantum;
+  double? get deadLine;
 }

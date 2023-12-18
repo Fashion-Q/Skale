@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'controller/algorithm_controller.dart';
-import 'entidade/tarefa.dart';
+import 'controller/skale_controller.dart';
+import 'entidade/task_entity.dart';
 import 'module/formulario_look.dart';
 import 'controller/formulario_controller.dart';
 import 'module/skale_look.dart';
@@ -26,6 +26,7 @@ class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // ignore: deprecated_member_use
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
@@ -41,9 +42,9 @@ class Root extends StatelessWidget {
 }
 
 SkaleLook teste() {
-  List<Task> tarefa = [];
+  List<TaskEntity> tarefa = [];
   List<String> char = ["A"];
-  int quant = 7;
+  int quant = 4;
   for (int i = 0; i < quant; i++) {
     int nextChar = char[i].codeUnitAt(0) + 1;
     char.add(String.fromCharCode(nextChar));
@@ -52,24 +53,27 @@ SkaleLook teste() {
   List<double> periodo = [10, 5, 8, 20, 25, 40, 70, 50, 20];
   for (int i = 0; i < char.length; i++) {
     tarefa.add(
-      Task(
-          nome: char[i],
+      TaskEntity(
+          name: char[i],
           periodo: periodo[i],
-          tempo: i == 2 ? 3 : (i + 1),
+          tempo: i == 2 ? 5 : 0.5,
           chegada: 0,
-          prioridade: i == 2 ? 0 : i + 1),
+          prioridade: i == 2 ? 0 : i + 1,
+          quantum: 0.5,
+          deadLine: i == 2
+              ? 10
+              : i == 3
+                  ? 1.5
+                  : 3),
     );
+    tarefa[i].quantum = 2;
   }
   SkaleController a = SkaleController(
-      task: tarefa,
-      x: 50,
-      checarAlgoritmos: [true, true, true, true, true],);
+    task: tarefa,
+    x: 100,
+    checarAlgoritmos: [true, true, true, true, true, true, true],
+  );
   a.setTasks();
-  //Shortest Job First
-  //"Shortest Remaining Time Next"
-  //Rate Monotonic
-  //"First Come First Serve"
-  //Prioridade
   SkaleLook p = SkaleLook(
     controller: a,
   );

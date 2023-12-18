@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:skale/share/drawer.dart';
 
 import '../controller/formulario_controller.dart';
 import '../share/snackbar.dart';
@@ -20,11 +21,13 @@ class FormularioPage extends StatelessWidget {
             style: primaryStyle(size: 20),
           ),
         ),
+        drawer: baseDrawer(size),
         body: SingleChildScrollView(
           child: Container(
-            margin: const EdgeInsets.only(left: 8, right: 8, top: 12),
+            margin: const EdgeInsets.only(left: 8, right: 8, top: 18),
             child: Column(
               children: [
+                //Text(size.width.toString()),
                 Column(
                   children: controller.listForm,
                 ),
@@ -35,17 +38,22 @@ class FormularioPage extends StatelessWidget {
                     width: size.width - 50,
                     margin: const EdgeInsets.only(top: 15),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                          width: size.width * 0.6,
                           child: Text(
                             "Escalonamento: ",
                             textAlign: TextAlign.end,
                             style: primaryStyle(size: 18),
                           ),
                         ),
+                        const Icon(
+                          Icons.star,
+                          color: Colors.blue,
+                          size: 18,
+                        ),
                         Container(
-                          width: 80,
+                          width: 50,
                           margin: const EdgeInsets.only(left: 12),
                           decoration: BoxDecoration(
                             border: Border.all(),
@@ -108,20 +116,21 @@ class FormularioPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
                   child: ElevatedButton(
-                    onPressed: controller.listForm.isNotEmpty &&
-                            controller.allButton
-                        ? () async{
-                            if (await controller.checkPrinciaisFuncionalidades()) {
-                            } else if (controller.allButton) {
-                              controller.controllSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                snackMessage(
-                                  controller.mensagem,
-                                ),
-                              );
-                            }
-                          }
-                        : null,
+                    onPressed:
+                        controller.listForm.isNotEmpty && controller.allButton
+                            ? () async {
+                                if (await controller.checkFuncionalidades()) {
+                                } else if (controller.allButton) {
+                                  controller.controllSnackBar();
+                                  // ignore: use_build_context_synchronously
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    snackMessage(
+                                      controller.mensagem,
+                                    ),
+                                  );
+                                }
+                              }
+                            : null,
                     child: Text(
                       "Válidar Informações",
                       style: primaryStyle(size: 18),
@@ -131,13 +140,13 @@ class FormularioPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 40),
                   child: ElevatedButton(
-                    onPressed: controller.validarInformacoes 
+                    onPressed: controller.validarInformacoes
                         ? () {
                             if (controller.validarInformacoes) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>  controller.skaleP!,
+                                  builder: (context) => controller.skaleP!,
                                 ),
                               );
                             } else if (controller.allButton) {
