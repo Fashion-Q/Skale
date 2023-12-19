@@ -6,7 +6,7 @@
   ## Introdução
     Aplicação feita no flutter que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais. Os algoritmos selecionados são: FCFS, SJF, SRTN, Prioridade, Rate Monotinic, Round Robin e DeadLine
 
-  ## FCFS
+  ## FCFS \Fasdsad asd
     Executa o primeiro que está na fila até o tempo acabar e depois segue consecutivamente a fila.
 
   ## SHF (Shortest Job First) - Não Preemptivo
