@@ -21,4 +21,4 @@
 
   ## Rate Monotonic - Preemtivo
     Parecido com o de `Prioridade`, a diferença é que a `Prioridade` vai depender do **Período** da tarefa, a tarefa que tiver o menor *período* será executado.
-    
+  @
