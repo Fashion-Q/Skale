@@ -7,6 +7,7 @@
 - [Prioridade](#Prioridade-Preemptivo)
 - [Rate Monotonic](#Rate-Monotonic-Preemptivo)
 - [Round Robin](#Round-Robin-Preemtivo)
+- [DeadLine](#DeadLine)
 
   ## Introdução
     Aplicação feita na linguagem `Dart` utilizando o framework `flutter` que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais. Os algoritmos selecionados são: FCFS, SJF, SRTN, Prioridade, Rate Monotinic, Round Robin e DeadLine
@@ -28,3 +29,6 @@
 
   ## Round Robin Preemtivo
     Será adicionado um `Quantum` para cada processo, ao diminuir o **tempo** do processo, o **Quantum** também será diminuido e quando o `Quantum` acaba, o processo sairá da fila e dará espaço para o próximo da fila e também será colocado no final da fila caso o **tempo** não tenha finalizado. `Observação:` Caso o **Quantum** finalize **e** o **tempo** de execução não finalizou **e** ao mesmo tempo chegue um novo processo na **fila**, o novo **processo** que chegou na **fila** entrará primeiro na **fila** e depois que o processo que teve o **Quantum** finalizado entrará na fila.
+
+  ## DeadLine
+    A prioridade do processo a ser executado será o menor tempo de **DeadLine**, sendo que o **DeadLine** é calculado com o tempo de **chegada** mais o **DeadLine**. Se o processo **chegou** no tempo zero e o **DeadLine** = 3, então seu **DeadLine** será **3**. Se o processo **chegou** no tempo 20.50 e o **DeadLine** = 3, então seu **DeadLine** será **23.50**.
