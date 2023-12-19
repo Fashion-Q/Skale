@@ -14,7 +14,7 @@
   ## SJF Shortest Job First Não Preemptivo
     Escolhe o processo que tem menos tempo de execução até finalizar. Ao finalizar, escolhe novamente o processo que tem menos tempo de execução.
 
-  ## SRTN Shortest Remaining Time Next - Preemtivo
+  ## SRTN Shortest Remaining Time Next - Preemptivo
     Escolhe o processo que tem menos tempo de execução, caso chegue um novo processo na fila, verifica se o tempo de execução de quem chegou é menor do que está sendo executado, se sim, há preempção para dar espaço ao processo que tem menos tempo de execução.
 
   ## Prioridade - Preemtivo
