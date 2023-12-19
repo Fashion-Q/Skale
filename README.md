@@ -1,10 +1,9 @@
 ## Sumário
 
 - [Introdução](#introdução)
-- [FCFS](#FSFC)
-- [A solução](#a-solução)
+- [FCFS](#fsfs)
 
-  ##Introdução
+  ## Introdução
     Aplicação feita no flutter que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais. Os algoritmos selecionados são: FCFS, SJF, SRTN, Prioridade, Rate Monotinic, Round Robin e DeadLine
 
   ## FCFS (First Come First Serve) - Não Preemptivo
