@@ -2,7 +2,7 @@
 
 - [Introdução](#introdução)
 - [FCFS](#FCFS-First-Come-First-Serve-Não-Preemptivo)
-- [SJF](#SJF-Shortest)
+- [SJF](#SJF-Shortest-Job-First)
 
   ## Introdução
     Aplicação feita no flutter que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais. Os algoritmos selecionados são: FCFS, SJF, SRTN, Prioridade, Rate Monotinic, Round Robin e DeadLine
@@ -10,7 +10,7 @@
   ## FCFS First Come First Serve Não-Preemptivo
     Executa o primeiro que está na fila até o tempo acabar e depois segue consecutivamente a fila.
 
-  ## SJF Shortest
+  ## SJF Shortest Job First
     Escolhe o processo que tem menos tempo de execução até finalizar. Ao finalizar, escolhe novamente o processo que tem menos tempo de execução.
 
   ## SRTN (Shortest Remaining Time Next - Preemtivo
