@@ -1,12 +1,12 @@
 ## Sumário
 
 - [Introdução](#introdução)
-- [FCFS](#FCFS-First-Come-First-Serve)
+- [FCFS](#FCFS-First-Come-First-Serve-Não-Preemptivo)
 
   ## Introdução
     Aplicação feita no flutter que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais. Os algoritmos selecionados são: FCFS, SJF, SRTN, Prioridade, Rate Monotinic, Round Robin e DeadLine
 
-  ## FCFS First Come First Serve
+  ## FCFS First Come First Serve Não-Preemptivo
     Executa o primeiro que está na fila até o tempo acabar e depois segue consecutivamente a fila.
 
   ## SHF (Shortest Job First) - Não Preemptivo
