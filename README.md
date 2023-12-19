@@ -1,4 +1,4 @@
 ## Skale (Escalonamento)
 Aplicação feita no flutter que resolve algoritmos de escalonamento apresentado pelo professor André Luiz na aula de Sistemas Operacionais.
 
-## Algoritmos selecionados
+### Algoritmos Selecionados são: FCFS (First Come First Serve)
