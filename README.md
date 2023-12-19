@@ -23,4 +23,4 @@
     Executa o processo que tem a maior prioridade (dar preferência a valores menores), caso chegue um novo processo na fila, será feito uma checagem para verificar quem tem maior prioridade, se o novo processo tem maior prioridade, o que está sendo executado sai da fila para dar espaço para o que tem maior prioridade.
 
   ## Rate Monotonic Preemptivo
-    Parecido com o de ##Prioridade, a diferença é que a `prioridade` vai depender do `período` da tarefa, a tarefa que tiver o menor `período` será executado. Caso chegue novos processo na fila, será feito checagem para ver quem tem o menor período e se houver, a tarefa sai da fila e dará espaço para quem tem menor `período`.
+    Parecido com o de [Prioridade](#Prioridade-Preemptivo), a diferença é que a `prioridade` vai depender do `período` da tarefa, a tarefa que tiver o menor `período` será executado. Caso chegue novos processo na fila, será feito checagem para ver quem tem o menor período e se houver, a tarefa sai da fila e dará espaço para quem tem menor `período`.
