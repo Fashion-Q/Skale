@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget baseDrawer(Size size) {
+Widget baseDrawer() {
   return Drawer(
     backgroundColor: const Color.fromARGB(255, 78, 78, 78),
     child: Column(
@@ -10,10 +10,10 @@ Widget baseDrawer(Size size) {
             currentAccountPicture: Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: ClipOval(
-                child: Image.asset("assets/imagens/home/4.jpeg"),
+                child: Image.asset("assets/imagens/home/skale.png"),
               ),
             ),
-            accountName: const Text("Verenilson da Silva Souza"),
+            accountName: const Text(""),
             accountEmail: const Text("")),
         Row(
           children: [
@@ -35,30 +35,30 @@ Widget baseDrawer(Size size) {
             ),
           ],
         ),
+        // Row(
+        //   children: [
+        //     Padding(
+        //       padding: const EdgeInsets.only(left: 2, right: 3),
+        //       child: SizedBox(
+        //         child: Image.asset(
+        //           "assets/imagens/home/d1.png",
+        //           width: 50,
+        //           height: 50,
+        //         ),
+        //       ),
+        //     ),
+        //     const Text(
+        //       "79 9 9629-1292",
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //       ),
+        //     ),
+        //   ],
+        // ),
         Row(
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 2, right: 3),
-              child: SizedBox(
-                child: Image.asset(
-                  "assets/imagens/home/d1.png",
-                  width: 50,
-                  height: 50,
-                ),
-              ),
-            ),
-            const Text(
-              "79 9 9629-1292",
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5),
+              padding: const EdgeInsets.only(left: 5, right: 5, top: 15),
               child: SizedBox(
                 child: Image.asset(
                   "assets/imagens/home/d2.png",
@@ -75,11 +75,11 @@ Widget baseDrawer(Size size) {
             ),
           ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 40),
+        const Padding(
+          padding: EdgeInsets.only(top: 40),
           child: SizedBox(
-            width: size.width * 0.7,
-            child: const Text(
+            width: 300,
+            child: Text(
               "O fantástico da vida é estar com alguém que saiba fazer de um pequeno instante, um grande momento!",
               textAlign: TextAlign.center,
               style: TextStyle(

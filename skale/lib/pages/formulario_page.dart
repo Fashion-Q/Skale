@@ -21,21 +21,26 @@ class FormularioPage extends StatelessWidget {
             style: primaryStyle(size: 20),
           ),
         ),
-        drawer: baseDrawer(size),
+        drawer: baseDrawer(),
         body: SingleChildScrollView(
           child: Container(
             margin: const EdgeInsets.only(left: 8, right: 8, top: 18),
             child: Column(
               children: [
                 //Text(size.width.toString()),
-                Column(
-                  children: controller.listForm,
+                Container(
+                  alignment: Alignment.center,
+                  margin: const EdgeInsets.only(bottom: 8, top: 8),
+                  width: 360,
+                  child: Column(
+                    children: controller.listForm,
+                  ),
                 ),
                 Visibility(
                   visible: controller.listForm.isNotEmpty,
                   child: Container(
                     color: Colors.black12,
-                    width: size.width - 50,
+                    width: 360,
                     margin: const EdgeInsets.only(top: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +83,8 @@ class FormularioPage extends StatelessWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 40),
-                  width: size.width * 0.91,
+                  width: size.width,
+                  alignment: Alignment.center,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -98,7 +104,7 @@ class FormularioPage extends StatelessWidget {
                             backgroundColor: Colors.green),
                         onPressed: controller.allButton
                             ? () {
-                                if (!controller.addForm(size)) {
+                                if (!controller.addForm()) {
                                   controller.controllSnackBar();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     snackMessage(

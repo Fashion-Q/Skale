@@ -31,13 +31,13 @@ class ListaDeFormulario extends ChangeNotifier {
   bool allButton = true;
   bool validarInformacoes = false;
 
-  bool addForm(Size size) {
+  bool addForm() {
     if (listForm.length > 25) {
       mensagem = "O tamanho de tarefas não pode ser maior que 25";
       return false;
     }
     validarInformacoes = false;
-    listForm.add(novoForm(size));
+    listForm.add(novoForm());
     notifyListeners();
     return true;
   }
@@ -46,14 +46,13 @@ class ListaDeFormulario extends ChangeNotifier {
     int linha,
     int coluna,
     String nome,
-    Size size,
     bool aberto,
   ) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: size.width * 0.55,
+          width: 198,
           child: Text(
             nome,
             style: primaryStyle(size: 20),
@@ -117,24 +116,23 @@ class ListaDeFormulario extends ChangeNotifier {
     }
   }
 
-  Widget novoForm(Size size) {
+  Widget novoForm() {
     List<Widget> rows = [];
     controller.add([]);
     controller[controller.length - 1] = List<TextEditingController>.generate(
         6, (index) => TextEditingController());
 
     for (int i = 0; i < 6; i++) {
-      rows.add(getRow(controller.length - 1, i, info[i], size, true));
+      rows.add(getRow(controller.length - 1, i, info[i], true));
     }
 
     return Container(
-      width: size.width - 50,
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: boxDecorationTopRightLeft(radius: 16, color: Colors.black12),
       child: Column(
         children: [
           Container(
-            width: size.width,
+            width: 360,
             height: 40,
             decoration:
                 boxDecorationTopRightLeft(radius: 16, color: Colors.blue),
@@ -144,9 +142,10 @@ class ListaDeFormulario extends ChangeNotifier {
               style: primaryStyle(size: 20, color: Colors.white),
             ),
           ),
-          Column(
-            children: rows,
-          )
+          ...rows
+          // Column(
+          //   children: rows,
+          // )
         ],
       ),
     );
